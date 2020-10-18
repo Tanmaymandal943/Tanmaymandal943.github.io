@@ -67,7 +67,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">MyMainScript</a></li><li><a href="#2">Your code here</a></li><li><a href="#3">Reading images</a></li><li><a href="#4">mask generation for bird</a></li><li><a href="#5">Mask for foreground of "bird.jpg"</a></li><li><a href="#6">Blurring of background for "bird.jpg"</a></li><li><a href="#7">Space varying r values for "bird.jpg"</a></li><li><a href="#8">Blurring kernels</a></li><li><a href="#13">mask generation for flower</a></li><li><a href="#14">Mask for foreground of "flower.jpg"</a></li><li><a href="#15">Blurring of background for "flower.jpg"</a></li><li><a href="#16">Spacially varying r values for "flower.jpg"</a></li><li><a href="#17">Blurring kernels</a></li></ul></div><h2 id="1">MyMainScript</h2><pre class="codeinput">tic;
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">MyMainScript</a></li><li><a href="#2">Your code here</a></li><li><a href="#3">Reading images</a></li><li><a href="#4">mask generation for bird</a></li><li><a href="#5">Original Image, Mask for foreground of "flower.jpg", Blacked out foreground , blacked out bakground</a></li><li><a href="#9">Blurring of background for "bird.jpg"</a></li><li><a href="#10">Space varying r values for "bird.jpg"</a></li><li><a href="#11">Blurring kernels</a></li><li><a href="#16">mask generation for flower</a></li><li><a href="#17">Original Image, Mask for foreground of "flower.jpg", Blacked out foreground , blacked out bakground</a></li><li><a href="#21">Blurring of background for "flower.jpg"</a></li><li><a href="#22">Spacially varying r values for "flower.jpg"</a></li><li><a href="#23">Blurring kernels</a></li></ul></div><h2 id="1">MyMainScript</h2><pre class="codeinput">tic;
 </pre><h2 id="2">Your code here</h2><pre class="codeinput">clear;
 </pre><h2 id="3">Reading images</h2><pre class="codeinput">im1 = imread(<span class="string">'../data/bird.jpg'</span>);
 im2 = imread(<span class="string">'../data/flower.jpg'</span>);
@@ -144,9 +144,23 @@ M(M~=1) = 0;
 
     30
 
-Elapsed time is 383.414380 seconds.
-</pre><h2 id="5">Mask for foreground of "bird.jpg"</h2><pre class="codeinput">imshow(logical(M));
-</pre><img vspace="5" hspace="5" src="myMainScript_01.png" alt=""> <h2 id="6">Blurring of background for "bird.jpg"</h2><pre class="codeinput">Out = zeros(size(im1));
+Elapsed time is 373.333092 seconds.
+</pre><h2 id="5">Original Image, Mask for foreground of "flower.jpg", Blacked out foreground , blacked out bakground</h2><pre class="codeinput">imshow(im1);
+</pre><img vspace="5" hspace="5" src="myMainScript_01.png" alt=""> <pre class="codeinput">imshow(logical(M));
+</pre><img vspace="5" hspace="5" src="myMainScript_02.png" alt=""> <pre class="codeinput">X = im1;
+
+Aa = M==0;
+Ma = zeros(size(im1));
+Ma(:,:,1) = Aa;
+Ma(:,:,2) = Aa;
+Ma(:,:,3) = Aa;
+
+X(Ma==0)=0;
+imshow(X);
+</pre><img vspace="5" hspace="5" src="myMainScript_03.png" alt=""> <pre class="codeinput">X = im1;
+X(Ma==1)=0;
+imshow(X);
+</pre><img vspace="5" hspace="5" src="myMainScript_04.png" alt=""> <h2 id="9">Blurring of background for "bird.jpg"</h2><pre class="codeinput">Out = zeros(size(im1));
 [Out(:,:,1), ~] = mySpatiallyVaryingKernel(im1(:,:,1),M,40);
 [Out(:,:,2),~] = mySpatiallyVaryingKernel(im1(:,:,2),M,40);
 [Out(:,:,3),krnl] = mySpatiallyVaryingKernel(im1(:,:,3),M,40);
@@ -156,15 +170,15 @@ Out(:,:,3) = mat2gray(Out(:,:,3));
 
 
 imshow(Out);
-</pre><img vspace="5" hspace="5" src="myMainScript_02.png" alt=""> <h2 id="7">Space varying r values for "bird.jpg"</h2><pre class="codeinput">myNumOfColors = 255;
+</pre><img vspace="5" hspace="5" src="myMainScript_05.png" alt=""> <h2 id="10">Space varying r values for "bird.jpg"</h2><pre class="codeinput">myNumOfColors = 40;
 myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
-imagesc(single(krnl),[0,255]), title(<span class="string">'Kernel bird'</span>),colormap(myColorScale),daspect ([1 1 1]); axis <span class="string">tight</span>; colorbar;
-</pre><img vspace="5" hspace="5" src="myMainScript_03.png" alt=""> <h2 id="8">Blurring kernels</h2><pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.2*40),[]);
-</pre><img vspace="5" hspace="5" src="myMainScript_04.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.4*40),[]);
-</pre><img vspace="5" hspace="5" src="myMainScript_05.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.6*40),[]);
-</pre><img vspace="5" hspace="5" src="myMainScript_06.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.8*40),[]);
-</pre><img vspace="5" hspace="5" src="myMainScript_07.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,40),[]);
-</pre><img vspace="5" hspace="5" src="myMainScript_08.png" alt=""> <h2 id="13">mask generation for flower</h2><pre class="codeinput">rng(180050109);
+imagesc(single(krnl),[0,40]), title(<span class="string">'Kernel bird'</span>),colormap(myColorScale),daspect ([1 1 1]); axis <span class="string">tight</span>; colorbar;
+</pre><img vspace="5" hspace="5" src="myMainScript_06.png" alt=""> <h2 id="11">Blurring kernels</h2><pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.2*40),[]);
+</pre><img vspace="5" hspace="5" src="myMainScript_07.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.4*40),[]);
+</pre><img vspace="5" hspace="5" src="myMainScript_08.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.6*40),[]);
+</pre><img vspace="5" hspace="5" src="myMainScript_09.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.8*40),[]);
+</pre><img vspace="5" hspace="5" src="myMainScript_10.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,40),[]);
+</pre><img vspace="5" hspace="5" src="myMainScript_11.png" alt=""> <h2 id="16">mask generation for flower</h2><pre class="codeinput">rng(180050109);
 im = im2;
 hs = 7;
 hr = 36;
@@ -258,9 +272,23 @@ M(M~=1) = 0;
 
     40
 
-Elapsed time is 47.734868 seconds.
-</pre><h2 id="14">Mask for foreground of "flower.jpg"</h2><pre class="codeinput">imshow(logical(M));
-</pre><img vspace="5" hspace="5" src="myMainScript_09.png" alt=""> <h2 id="15">Blurring of background for "flower.jpg"</h2><pre class="codeinput">Out = zeros(size(im2));
+Elapsed time is 46.232959 seconds.
+</pre><h2 id="17">Original Image, Mask for foreground of "flower.jpg", Blacked out foreground , blacked out bakground</h2><pre class="codeinput">imshow(im2);
+</pre><img vspace="5" hspace="5" src="myMainScript_12.png" alt=""> <pre class="codeinput">imshow(logical(M));
+</pre><img vspace="5" hspace="5" src="myMainScript_13.png" alt=""> <pre class="codeinput">X = im2;
+
+Aa = M==0;
+Ma = zeros(size(im2));
+Ma(:,:,1) = Aa;
+Ma(:,:,2) = Aa;
+Ma(:,:,3) = Aa;
+
+X(Ma==0)=0;
+imshow(X);
+</pre><img vspace="5" hspace="5" src="myMainScript_14.png" alt=""> <pre class="codeinput">X = im2;
+X(Ma==1)=0;
+imshow(X);
+</pre><img vspace="5" hspace="5" src="myMainScript_15.png" alt=""> <h2 id="21">Blurring of background for "flower.jpg"</h2><pre class="codeinput">Out = zeros(size(im2));
 [Out(:,:,1),~] = mySpatiallyVaryingKernel(im2(:,:,1),M,20);
 [Out(:,:,2),~] = mySpatiallyVaryingKernel(im2(:,:,2),M,20);
 [Out(:,:,3),krnl] = mySpatiallyVaryingKernel(im2(:,:,3),M,20);
@@ -271,22 +299,22 @@ Out(:,:,3) = mat2gray(Out(:,:,3));
 
 
 imshow(Out);
-</pre><img vspace="5" hspace="5" src="myMainScript_10.png" alt=""> <h2 id="16">Spacially varying r values for "flower.jpg"</h2><pre class="codeinput">myNumOfColors = 255;
+</pre><img vspace="5" hspace="5" src="myMainScript_16.png" alt=""> <h2 id="22">Spacially varying r values for "flower.jpg"</h2><pre class="codeinput">myNumOfColors = 20;
 myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
 
-imagesc(single(krnl),[0,255]), title(<span class="string">'kernel flower'</span>),colormap(myColorScale),daspect ([1 1 1]); axis <span class="string">tight</span>; colorbar;
-</pre><img vspace="5" hspace="5" src="myMainScript_11.png" alt=""> <h2 id="17">Blurring kernels</h2><pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.2*20),[]);
-</pre><img vspace="5" hspace="5" src="myMainScript_12.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.4*20),[]);
-</pre><img vspace="5" hspace="5" src="myMainScript_13.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.6*20),[]);
-</pre><img vspace="5" hspace="5" src="myMainScript_14.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.8*20),[]);
-</pre><img vspace="5" hspace="5" src="myMainScript_15.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,20),[]);
+imagesc(single(krnl),[0,20]), title(<span class="string">'kernel flower'</span>),colormap(myColorScale),daspect ([1 1 1]); axis <span class="string">tight</span>; colorbar;
+</pre><img vspace="5" hspace="5" src="myMainScript_17.png" alt=""> <h2 id="23">Blurring kernels</h2><pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.2*20),[]);
+</pre><img vspace="5" hspace="5" src="myMainScript_18.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.4*20),[]);
+</pre><img vspace="5" hspace="5" src="myMainScript_19.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.6*20),[]);
+</pre><img vspace="5" hspace="5" src="myMainScript_20.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.8*20),[]);
+</pre><img vspace="5" hspace="5" src="myMainScript_21.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,20),[]);
 
 
 
 
 toc;
-</pre><pre class="codeoutput">Elapsed time is 118.826665 seconds.
-</pre><img vspace="5" hspace="5" src="myMainScript_16.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020b</a><br></p></div><!--
+</pre><pre class="codeoutput">Elapsed time is 115.906587 seconds.
+</pre><img vspace="5" hspace="5" src="myMainScript_22.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% MyMainScript
 tic;
@@ -312,8 +340,25 @@ idx1 = reshape(idx1,[size(output1,1),size(output1,2)]);
 M = idx1;
 M(M==14 | M==19 | M==1) = 1;
 M(M~=1) = 0;
-%% Mask for foreground of "bird.jpg"
+%% Original Image, Mask for foreground of "flower.jpg", Blacked out foreground , blacked out bakground 
+imshow(im1);
+%%
 imshow(logical(M));
+%%
+X = im1;
+
+Aa = M==0;
+Ma = zeros(size(im1));
+Ma(:,:,1) = Aa;
+Ma(:,:,2) = Aa;
+Ma(:,:,3) = Aa;
+
+X(Ma==0)=0;
+imshow(X);
+%%
+X = im1;
+X(Ma==1)=0;
+imshow(X);
 
 %% Blurring of background for "bird.jpg"
 Out = zeros(size(im1));
@@ -331,9 +376,9 @@ imshow(Out);
 
 %% Space varying r values for "bird.jpg"
 
-myNumOfColors = 255;
+myNumOfColors = 40;
 myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
-imagesc(single(krnl),[0,255]), title('Kernel bird'),colormap(myColorScale),daspect ([1 1 1]); axis tight; colorbar;
+imagesc(single(krnl),[0,40]), title('Kernel bird'),colormap(myColorScale),daspect ([1 1 1]); axis tight; colorbar;
 
 
 
@@ -373,8 +418,25 @@ M(M==1) = 0;
 M(M==10 | M==7 | M==24) = 1;
 M(M~=1) = 0;
 
-%% Mask for foreground of "flower.jpg"
+%% Original Image, Mask for foreground of "flower.jpg", Blacked out foreground , blacked out bakground 
+imshow(im2);
+%%
 imshow(logical(M));
+%%
+X = im2;
+
+Aa = M==0;
+Ma = zeros(size(im2));
+Ma(:,:,1) = Aa;
+Ma(:,:,2) = Aa;
+Ma(:,:,3) = Aa;
+
+X(Ma==0)=0;
+imshow(X);
+%%
+X = im2;
+X(Ma==1)=0;
+imshow(X);
 
 %% Blurring of background for "flower.jpg"
 Out = zeros(size(im2));
@@ -391,10 +453,10 @@ imshow(Out);
 
 %% Spacially varying r values for "flower.jpg"
 
-myNumOfColors = 255;
+myNumOfColors = 20;
 myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
 
-imagesc(single(krnl),[0,255]), title('kernel flower'),colormap(myColorScale),daspect ([1 1 1]); axis tight; colorbar;
+imagesc(single(krnl),[0,20]), title('kernel flower'),colormap(myColorScale),daspect ([1 1 1]); axis tight; colorbar;
 
 %% Blurring kernels
 
