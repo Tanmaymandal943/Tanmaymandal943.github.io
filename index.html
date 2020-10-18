@@ -6,8 +6,8 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>myMainScript</title><meta name="generator" content="MATLAB 9.8"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-09-29"><meta name="DC.source" content="myMainScript.m"><style type="text/css">
-html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+      --><title>myMainScript</title><meta name="generator" content="MATLAB 9.9"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-10-18"><meta name="DC.source" content="myMainScript.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
 html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
@@ -67,222 +67,357 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">MyMainScript (Please zoom out in browser to view images side by side)</a></li><li><a href="#2">Barbara.mat</a></li><li><a href="#3">Grass.png</a></li><li><a href="#4">honeyCombReal.png</a></li></ul></div><h2 id="1">MyMainScript (Please zoom out in browser to view images side by side)</h2><pre class="codeinput">myNumOfColors = 200;
-myColorScale = [ [0:1/(myNumOfColors-1):1]',[0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">MyMainScript</a></li><li><a href="#2">Your code here</a></li><li><a href="#3">Reading images</a></li><li><a href="#4">mask generation for bird</a></li><li><a href="#5">Mask for foreground of "bird.jpg"</a></li><li><a href="#6">Blurring of background for "bird.jpg"</a></li><li><a href="#7">Space varying r values for "bird.jpg"</a></li><li><a href="#8">Blurring kernels</a></li><li><a href="#13">mask generation for flower</a></li><li><a href="#14">Mask for foreground of "flower.jpg"</a></li><li><a href="#15">Blurring of background for "flower.jpg"</a></li><li><a href="#16">Spacially varying r values for "flower.jpg"</a></li><li><a href="#17">Blurring kernels</a></li></ul></div><h2 id="1">MyMainScript</h2><pre class="codeinput">tic;
+</pre><h2 id="2">Your code here</h2><pre class="codeinput">clear;
+</pre><h2 id="3">Reading images</h2><pre class="codeinput">im1 = imread(<span class="string">'../data/bird.jpg'</span>);
+im2 = imread(<span class="string">'../data/flower.jpg'</span>);
+</pre><h2 id="4">mask generation for bird</h2><pre class="codeinput">rng(180050004);
+im = im1;
+hs = 10;
+hr = 80;
+resize = 1;
+num_clusters = 30;
+iter2 = 30;
+[output1,shifting_points1,idx1] = myMeanShiftSegmentation(im,hs,hr,resize,num_clusters,iter2);
+
+idx1 = reshape(idx1,[size(output1,1),size(output1,2)]);
+M = idx1;
+M(M==14 | M==19 | M==1) = 1;
+M(M~=1) = 0;
+</pre><pre class="codeoutput">     1
+
+     2
+
+     3
+
+     4
+
+     5
+
+     6
+
+     7
+
+     8
+
+     9
+
+    10
+
+    11
+
+    12
+
+    13
+
+    14
+
+    15
+
+    16
+
+    17
+
+    18
+
+    19
+
+    20
+
+    21
+
+    22
+
+    23
+
+    24
+
+    25
+
+    26
+
+    27
+
+    28
+
+    29
+
+    30
+
+Elapsed time is 383.414380 seconds.
+</pre><h2 id="5">Mask for foreground of "bird.jpg"</h2><pre class="codeinput">imshow(logical(M));
+</pre><img vspace="5" hspace="5" src="myMainScript_01.png" alt=""> <h2 id="6">Blurring of background for "bird.jpg"</h2><pre class="codeinput">Out = zeros(size(im1));
+[Out(:,:,1), ~] = mySpatiallyVaryingKernel(im1(:,:,1),M,40);
+[Out(:,:,2),~] = mySpatiallyVaryingKernel(im1(:,:,2),M,40);
+[Out(:,:,3),krnl] = mySpatiallyVaryingKernel(im1(:,:,3),M,40);
+Out(:,:,1) = mat2gray(Out(:,:,1));
+Out(:,:,2) = mat2gray(Out(:,:,2));
+Out(:,:,3) = mat2gray(Out(:,:,3));
 
 
-tic;
-</pre><h2 id="2">Barbara.mat</h2><pre class="codeinput">im = load(<span class="string">"../data/barbara.mat"</span>);
-im = im.imageOrig;
-im=double(im);
-sd=(0.05)*(max(im,[],<span class="string">'all'</span>)-min(im,[],<span class="string">'all'</span>));
-im_noise=im+sd*randn(size(im,1),size(im,2));
-[fi,mask] = myBilateralFiltering(im_noise,1.5,10,9);
-[fi1,mask] = myBilateralFiltering(im_noise,1.5*0.9,10,9);
-[fi2,mask] = myBilateralFiltering(im_noise,1.5*1.1,10,9);
-[fi3,mask] = myBilateralFiltering(im_noise,1.5,10*0.9,9);
-[fi4,mask] = myBilateralFiltering(im_noise,1.5,10*1.1,9);
+imshow(Out);
+</pre><img vspace="5" hspace="5" src="myMainScript_02.png" alt=""> <h2 id="7">Space varying r values for "bird.jpg"</h2><pre class="codeinput">myNumOfColors = 255;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc(single(krnl),[0,255]), title(<span class="string">'Kernel bird'</span>),colormap(myColorScale),daspect ([1 1 1]); axis <span class="string">tight</span>; colorbar;
+</pre><img vspace="5" hspace="5" src="myMainScript_03.png" alt=""> <h2 id="8">Blurring kernels</h2><pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.2*40),[]);
+</pre><img vspace="5" hspace="5" src="myMainScript_04.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.4*40),[]);
+</pre><img vspace="5" hspace="5" src="myMainScript_05.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.6*40),[]);
+</pre><img vspace="5" hspace="5" src="myMainScript_06.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.8*40),[]);
+</pre><img vspace="5" hspace="5" src="myMainScript_07.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,40),[]);
+</pre><img vspace="5" hspace="5" src="myMainScript_08.png" alt=""> <h2 id="13">mask generation for flower</h2><pre class="codeinput">rng(180050109);
+im = im2;
+hs = 7;
+hr = 36;
+resize = 1;
+num_clusters = 25;
+iter3 = 40;
+[output3,shifting_points3,idx3] = myMeanShiftSegmentation(im,hs,hr,resize,num_clusters,iter3);
+
+idx3 = reshape(idx3,[size(output3,1),size(output3,2)]);
+M = idx3;
+M(M==1) = 0;
+M(M==10 | M==7 | M==24) = 1;
+M(M~=1) = 0;
+</pre><pre class="codeoutput">     1
+
+     2
+
+     3
+
+     4
+
+     5
+
+     6
+
+     7
+
+     8
+
+     9
+
+    10
+
+    11
+
+    12
+
+    13
+
+    14
+
+    15
+
+    16
+
+    17
+
+    18
+
+    19
+
+    20
+
+    21
+
+    22
+
+    23
+
+    24
+
+    25
+
+    26
+
+    27
+
+    28
+
+    29
+
+    30
+
+    31
+
+    32
+
+    33
+
+    34
+
+    35
+
+    36
+
+    37
+
+    38
+
+    39
+
+    40
+
+Elapsed time is 47.734868 seconds.
+</pre><h2 id="14">Mask for foreground of "flower.jpg"</h2><pre class="codeinput">imshow(logical(M));
+</pre><img vspace="5" hspace="5" src="myMainScript_09.png" alt=""> <h2 id="15">Blurring of background for "flower.jpg"</h2><pre class="codeinput">Out = zeros(size(im2));
+[Out(:,:,1),~] = mySpatiallyVaryingKernel(im2(:,:,1),M,20);
+[Out(:,:,2),~] = mySpatiallyVaryingKernel(im2(:,:,2),M,20);
+[Out(:,:,3),krnl] = mySpatiallyVaryingKernel(im2(:,:,3),M,20);
+
+Out(:,:,1) = mat2gray(Out(:,:,1));
+Out(:,:,2) = mat2gray(Out(:,:,2));
+Out(:,:,3) = mat2gray(Out(:,:,3));
 
 
-bar = RMSD(im,fi);
-disp(<span class="string">"Input : Barbara.mat (window size 9)"</span>);
-disp(<span class="string">"Optimal Sigma spacial,intensity for lowest RMSD: 1.5 , 10"</span>);
-disp(<span class="string">"RMSD 1,1 : "</span>+bar);
-disp(<span class="string">"RMSD 0.9,1 : "</span>+RMSD(im,fi1));
-disp(<span class="string">"RMSD 1.1,1 : "</span>+RMSD(im,fi2));
-disp(<span class="string">"RMSD 1,0.9 : "</span>+RMSD(im,fi3));
-disp(<span class="string">"RMSD 1,1.1 : "</span>+RMSD(im,fi4));
-figure;
-imagesc(im), title(<span class="string">"Original"</span>),colormap(myColorScale),daspect ([1 1 1]); axis <span class="string">tight</span>; colorbar;
-figure;
-imagesc(im_noise), title(<span class="string">"noisy"</span>),colormap(myColorScale),daspect ([1 1 1]); axis <span class="string">tight</span>; colorbar;
-figure;
-imagesc(fi), title(<span class="string">"filtered"</span>),colormap(myColorScale),daspect ([1 1 1]); axis <span class="string">tight</span>; colorbar;
-figure;
-imagesc(mask), title(<span class="string">"Mask"</span>),colormap(myColorScale),daspect ([1 1 1]); axis <span class="string">tight</span>; colorbar;
+imshow(Out);
+</pre><img vspace="5" hspace="5" src="myMainScript_10.png" alt=""> <h2 id="16">Spacially varying r values for "flower.jpg"</h2><pre class="codeinput">myNumOfColors = 255;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
 
-<span class="comment">%disp("Optimal Sigma spacial,intensity for lowest RMSD: 1.5 , 10");</span>
-</pre><pre class="codeoutput">Input : Barbara.mat (window size 9)
-Optimal Sigma spacial,intensity for lowest RMSD: 1.5 , 10
-RMSD 1,1 : 3.2832
-RMSD 0.9,1 : 3.2861
-RMSD 1.1,1 : 3.2869
-RMSD 1,0.9 : 3.304
-RMSD 1,1.1 : 3.3009
-</pre><img vspace="5" hspace="5" src="myMainScript_01.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_02.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_03.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_04.png" alt=""> <h2 id="3">Grass.png</h2><pre class="codeinput">im = imread(<span class="string">"../data/grass.png"</span>);
-im=double(im);
-sd=(0.05)*(max(im,[],<span class="string">'all'</span>)-min(im,[],<span class="string">'all'</span>));
-im_noise=im+sd*randn(size(im,1),size(im,2));
-[fi,mask] = myBilateralFiltering(im_noise,0.85,40,9);
-[fi1,mask] = myBilateralFiltering(im_noise,0.85*0.9,40,9);
-[fi2,mask] = myBilateralFiltering(im_noise,0.85*1.1,40,9);
-[fi3,mask] = myBilateralFiltering(im_noise,0.85,40*0.9,9);
-[fi4,mask] = myBilateralFiltering(im_noise,0.85,40*1.1,9);
+imagesc(single(krnl),[0,255]), title(<span class="string">'kernel flower'</span>),colormap(myColorScale),daspect ([1 1 1]); axis <span class="string">tight</span>; colorbar;
+</pre><img vspace="5" hspace="5" src="myMainScript_11.png" alt=""> <h2 id="17">Blurring kernels</h2><pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.2*20),[]);
+</pre><img vspace="5" hspace="5" src="myMainScript_12.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.4*20),[]);
+</pre><img vspace="5" hspace="5" src="myMainScript_13.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.6*20),[]);
+</pre><img vspace="5" hspace="5" src="myMainScript_14.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,0.8*20),[]);
+</pre><img vspace="5" hspace="5" src="myMainScript_15.png" alt=""> <pre class="codeinput">imshow(fspecial(<span class="string">'disk'</span>,20),[]);
 
 
-bar = RMSD(im,fi);
-disp(<span class="string">"Input : Grass.png (window size 9)"</span>);
-disp(<span class="string">"Optimal Sigma spacial,intensity for lowest RMSD: 0.85 , 40"</span>);
-disp(<span class="string">"RMSD 1,1 : "</span>+bar);
-disp(<span class="string">"RMSD 0.9,1 : "</span>+RMSD(im,fi1));
-disp(<span class="string">"RMSD 1.1,1 : "</span>+RMSD(im,fi2));
-disp(<span class="string">"RMSD 1,0.9 : "</span>+RMSD(im,fi3));
-disp(<span class="string">"RMSD 1,1.1 : "</span>+RMSD(im,fi4));
-figure;
-imagesc(im), title(<span class="string">"Original"</span>),colormap(myColorScale),daspect ([1 1 1]); axis <span class="string">tight</span>; colorbar;
-figure;
-imagesc(im_noise), title(<span class="string">"noisy"</span>),colormap(myColorScale),daspect ([1 1 1]); axis <span class="string">tight</span>; colorbar;
-figure;
-imagesc(fi), title(<span class="string">"filtered"</span>),colormap(myColorScale),daspect ([1 1 1]); axis <span class="string">tight</span>; colorbar;
-figure;
-imagesc(mask), title(<span class="string">"Mask"</span>),colormap(myColorScale),daspect ([1 1 1]); axis <span class="string">tight</span>; colorbar;
-</pre><pre class="codeoutput">Input : Grass.png (window size 9)
-Optimal Sigma spacial,intensity for lowest RMSD: 0.85 , 40
-RMSD 1,1 : 7.3957
-RMSD 0.9,1 : 7.4139
-RMSD 1.1,1 : 7.4706
-RMSD 1,0.9 : 7.4234
-RMSD 1,1.1 : 7.4108
-</pre><img vspace="5" hspace="5" src="myMainScript_05.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_06.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_07.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_08.png" alt=""> <h2 id="4">honeyCombReal.png</h2><pre class="codeinput">im = imread(<span class="string">"../data/honeyCombReal.png"</span>);
-im=double(im);
-sd=(0.05)*(max(im,[],<span class="string">'all'</span>)-min(im,[],<span class="string">'all'</span>));
-im_noise=im+sd*randn(size(im,1),size(im,2));
-[fi,mask] = myBilateralFiltering(im_noise,1.0,38,9);
-[fi1,mask] = myBilateralFiltering(im_noise,1.0*0.9,38,9);
-[fi2,mask] = myBilateralFiltering(im_noise,1.0*1.1,38,9);
-[fi3,mask] = myBilateralFiltering(im_noise,1.0,38*0.9,9);
-[fi4,mask] = myBilateralFiltering(im_noise,1.0,38*1.1,9);
 
-
-bar = RMSD(im,fi);
-disp(<span class="string">"Input : honeyCombReal.png (window size 9)"</span>);
-disp(<span class="string">"Optimal Sigma spacial,intensity for lowest RMSD: 1.0 , 38"</span>);
-disp(<span class="string">"RMSD 1,1 : "</span>+bar);
-disp(<span class="string">"RMSD 0.9,1 : "</span>+RMSD(im,fi1));
-disp(<span class="string">"RMSD 1.1,1 : "</span>+RMSD(im,fi2));
-disp(<span class="string">"RMSD 1,0.9 : "</span>+RMSD(im,fi3));
-disp(<span class="string">"RMSD 1,1.1 : "</span>+RMSD(im,fi4));
-
-figure;
-imagesc(im), title(<span class="string">"Original"</span>),colormap(myColorScale),daspect ([1 1 1]); axis <span class="string">tight</span>; colorbar;
-figure;
-imagesc(im_noise), title(<span class="string">"noisy"</span>),colormap(myColorScale),daspect ([1 1 1]); axis <span class="string">tight</span>; colorbar;
-figure;
-imagesc(fi), title(<span class="string">"filtered"</span>),colormap(myColorScale),daspect ([1 1 1]); axis <span class="string">tight</span>; colorbar;
-figure;
-imagesc(mask), title(<span class="string">"Mask"</span>),colormap(myColorScale),daspect ([1 1 1]); axis <span class="string">tight</span>; colorbar;
 
 toc;
-</pre><pre class="codeoutput">Input : honeyCombReal.png (window size 9)
-Optimal Sigma spacial,intensity for lowest RMSD: 1.0 , 38
-RMSD 1,1 : 7.3186
-RMSD 0.9,1 : 7.339
-RMSD 1.1,1 : 7.37
-RMSD 1,0.9 : 7.3525
-RMSD 1,1.1 : 7.3469
-Elapsed time is 28.819847 seconds.
-</pre><img vspace="5" hspace="5" src="myMainScript_09.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_10.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_11.png" alt=""> <img vspace="5" hspace="5" src="myMainScript_12.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020a</a><br></p></div><!--
+</pre><pre class="codeoutput">Elapsed time is 118.826665 seconds.
+</pre><img vspace="5" hspace="5" src="myMainScript_16.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
-%% MyMainScript (Please zoom out in browser to view images side by side)
-myNumOfColors = 200;
-myColorScale = [ [0:1/(myNumOfColors-1):1]',[0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
-
-
+%% MyMainScript
 tic;
-%% Barbara.mat
+%% Your code here
 
-im = load("../data/barbara.mat");
-im = im.imageOrig;
-im=double(im);
-sd=(0.05)*(max(im,[],'all')-min(im,[],'all'));
-im_noise=im+sd*randn(size(im,1),size(im,2));
-[fi,mask] = myBilateralFiltering(im_noise,1.5,10,9);
-[fi1,mask] = myBilateralFiltering(im_noise,1.5*0.9,10,9);
-[fi2,mask] = myBilateralFiltering(im_noise,1.5*1.1,10,9);
-[fi3,mask] = myBilateralFiltering(im_noise,1.5,10*0.9,9);
-[fi4,mask] = myBilateralFiltering(im_noise,1.5,10*1.1,9);
+clear;
+%% Reading images
 
+im1 = imread('../data/bird.jpg');
+im2 = imread('../data/flower.jpg');
 
-bar = RMSD(im,fi);
-disp("Input : Barbara.mat (window size 9)");
-disp("Optimal Sigma spacial,intensity for lowest RMSD: 1.5 , 10");
-disp("RMSD 1,1 : "+bar);
-disp("RMSD 0.9,1 : "+RMSD(im,fi1));
-disp("RMSD 1.1,1 : "+RMSD(im,fi2));
-disp("RMSD 1,0.9 : "+RMSD(im,fi3));
-disp("RMSD 1,1.1 : "+RMSD(im,fi4));
-figure;
-imagesc(im), title("Original"),colormap(myColorScale),daspect ([1 1 1]); axis tight; colorbar;
-figure;
-imagesc(im_noise), title("noisy"),colormap(myColorScale),daspect ([1 1 1]); axis tight; colorbar;
-figure;
-imagesc(fi), title("filtered"),colormap(myColorScale),daspect ([1 1 1]); axis tight; colorbar;
-figure;
-imagesc(mask), title("Mask"),colormap(myColorScale),daspect ([1 1 1]); axis tight; colorbar;
+%% mask generation for bird
+rng(180050004);
+im = im1;
+hs = 10;
+hr = 80;
+resize = 1;
+num_clusters = 30;
+iter2 = 30;
+[output1,shifting_points1,idx1] = myMeanShiftSegmentation(im,hs,hr,resize,num_clusters,iter2);
 
-%disp("Optimal Sigma spacial,intensity for lowest RMSD: 1.5 , 10");
+idx1 = reshape(idx1,[size(output1,1),size(output1,2)]);
+M = idx1;
+M(M==14 | M==19 | M==1) = 1;
+M(M~=1) = 0;
+%% Mask for foreground of "bird.jpg"
+imshow(logical(M));
 
-%% Grass.png
-
-im = imread("../data/grass.png");
-im=double(im);
-sd=(0.05)*(max(im,[],'all')-min(im,[],'all'));
-im_noise=im+sd*randn(size(im,1),size(im,2));
-[fi,mask] = myBilateralFiltering(im_noise,0.85,40,9);
-[fi1,mask] = myBilateralFiltering(im_noise,0.85*0.9,40,9);
-[fi2,mask] = myBilateralFiltering(im_noise,0.85*1.1,40,9);
-[fi3,mask] = myBilateralFiltering(im_noise,0.85,40*0.9,9);
-[fi4,mask] = myBilateralFiltering(im_noise,0.85,40*1.1,9);
+%% Blurring of background for "bird.jpg"
+Out = zeros(size(im1));
+[Out(:,:,1), ~] = mySpatiallyVaryingKernel(im1(:,:,1),M,40);
+[Out(:,:,2),~] = mySpatiallyVaryingKernel(im1(:,:,2),M,40);
+[Out(:,:,3),krnl] = mySpatiallyVaryingKernel(im1(:,:,3),M,40);
+Out(:,:,1) = mat2gray(Out(:,:,1));
+Out(:,:,2) = mat2gray(Out(:,:,2));
+Out(:,:,3) = mat2gray(Out(:,:,3));
 
 
-bar = RMSD(im,fi);
-disp("Input : Grass.png (window size 9)");
-disp("Optimal Sigma spacial,intensity for lowest RMSD: 0.85 , 40");
-disp("RMSD 1,1 : "+bar);
-disp("RMSD 0.9,1 : "+RMSD(im,fi1));
-disp("RMSD 1.1,1 : "+RMSD(im,fi2));
-disp("RMSD 1,0.9 : "+RMSD(im,fi3));
-disp("RMSD 1,1.1 : "+RMSD(im,fi4));
-figure;
-imagesc(im), title("Original"),colormap(myColorScale),daspect ([1 1 1]); axis tight; colorbar;
-figure;
-imagesc(im_noise), title("noisy"),colormap(myColorScale),daspect ([1 1 1]); axis tight; colorbar;
-figure;
-imagesc(fi), title("filtered"),colormap(myColorScale),daspect ([1 1 1]); axis tight; colorbar;
-figure;
-imagesc(mask), title("Mask"),colormap(myColorScale),daspect ([1 1 1]); axis tight; colorbar;
+imshow(Out);
 
 
-%% honeyCombReal.png
 
-im = imread("../data/honeyCombReal.png");
-im=double(im);
-sd=(0.05)*(max(im,[],'all')-min(im,[],'all'));
-im_noise=im+sd*randn(size(im,1),size(im,2));
-[fi,mask] = myBilateralFiltering(im_noise,1.0,38,9);
-[fi1,mask] = myBilateralFiltering(im_noise,1.0*0.9,38,9);
-[fi2,mask] = myBilateralFiltering(im_noise,1.0*1.1,38,9);
-[fi3,mask] = myBilateralFiltering(im_noise,1.0,38*0.9,9);
-[fi4,mask] = myBilateralFiltering(im_noise,1.0,38*1.1,9);
+%% Space varying r values for "bird.jpg"
+
+myNumOfColors = 255;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc(single(krnl),[0,255]), title('Kernel bird'),colormap(myColorScale),daspect ([1 1 1]); axis tight; colorbar;
 
 
-bar = RMSD(im,fi);
-disp("Input : honeyCombReal.png (window size 9)");
-disp("Optimal Sigma spacial,intensity for lowest RMSD: 1.0 , 38");
-disp("RMSD 1,1 : "+bar);
-disp("RMSD 0.9,1 : "+RMSD(im,fi1));
-disp("RMSD 1.1,1 : "+RMSD(im,fi2));
-disp("RMSD 1,0.9 : "+RMSD(im,fi3));
-disp("RMSD 1,1.1 : "+RMSD(im,fi4));
 
-figure;
-imagesc(im), title("Original"),colormap(myColorScale),daspect ([1 1 1]); axis tight; colorbar;
-figure;
-imagesc(im_noise), title("noisy"),colormap(myColorScale),daspect ([1 1 1]); axis tight; colorbar;
-figure;
-imagesc(fi), title("filtered"),colormap(myColorScale),daspect ([1 1 1]); axis tight; colorbar;
-figure;
-imagesc(mask), title("Mask"),colormap(myColorScale),daspect ([1 1 1]); axis tight; colorbar;
+%% Blurring kernels
+
+imshow(fspecial('disk',0.2*40),[]);
+
+%%
+
+imshow(fspecial('disk',0.4*40),[]);
+
+%%
+
+imshow(fspecial('disk',0.6*40),[]);
+
+%%
+
+imshow(fspecial('disk',0.8*40),[]);
+
+%%
+
+imshow(fspecial('disk',40),[]);
+
+%% mask generation for flower
+rng(180050109);
+im = im2;
+hs = 7;
+hr = 36;
+resize = 1;
+num_clusters = 25; 
+iter3 = 40;
+[output3,shifting_points3,idx3] = myMeanShiftSegmentation(im,hs,hr,resize,num_clusters,iter3);
+
+idx3 = reshape(idx3,[size(output3,1),size(output3,2)]);
+M = idx3;
+M(M==1) = 0;
+M(M==10 | M==7 | M==24) = 1;
+M(M~=1) = 0;
+
+%% Mask for foreground of "flower.jpg"
+imshow(logical(M));
+
+%% Blurring of background for "flower.jpg"
+Out = zeros(size(im2));
+[Out(:,:,1),~] = mySpatiallyVaryingKernel(im2(:,:,1),M,20);
+[Out(:,:,2),~] = mySpatiallyVaryingKernel(im2(:,:,2),M,20);
+[Out(:,:,3),krnl] = mySpatiallyVaryingKernel(im2(:,:,3),M,20);
+
+Out(:,:,1) = mat2gray(Out(:,:,1));
+Out(:,:,2) = mat2gray(Out(:,:,2));
+Out(:,:,3) = mat2gray(Out(:,:,3));
+
+
+imshow(Out);
+
+%% Spacially varying r values for "flower.jpg"
+
+myNumOfColors = 255;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+
+imagesc(single(krnl),[0,255]), title('kernel flower'),colormap(myColorScale),daspect ([1 1 1]); axis tight; colorbar;
+
+%% Blurring kernels
+
+imshow(fspecial('disk',0.2*20),[]);
+
+%%
+
+imshow(fspecial('disk',0.4*20),[]);
+
+%%
+
+imshow(fspecial('disk',0.6*20),[]);
+
+%%
+
+imshow(fspecial('disk',0.8*20),[]);
+
+%%
+
+imshow(fspecial('disk',20),[]);
+
+
+
 
 toc;
 
